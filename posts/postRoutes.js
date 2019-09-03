@@ -46,5 +46,27 @@ router.post('/', (req, res) => {
     }
 })
 
+//Put - update post
+router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const postUpdate = req.body;
+    if (postUpdate.title || postUpdate.contents) {
+        db.update(id, postUpdate)
+            .then(isUpdated => {
+                if (isUpdated) {
+                    db.findById(id)
+                        .then(post => {
+                            res.json(post);
+                        });
+                } else {
+                    res.status(404).json({ message: "The post with that ID not found." });
+                }
+            }).catch(err => {
+                res.status(500).json({ error: "That post could not be updated." });
+            });
+    } else {
+        res.status(400).json({ errorMessage: "Title and contents required." });
+    }
+})
 
 module.exports = router; 
